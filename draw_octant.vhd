@@ -25,8 +25,8 @@ ARCHITECTURE comb OF draw_octant IS
   -- note on vector sizes. err1,err2 must be one bit larger to preserved signed error info
   -- error is always adjusted to minimise signed error and therefore 
   -- can never be larger than vsize bits even though also signed
-  SIGNAL error                    : signed(vsize-1 DOWNTO 0);
-  SIGNAL err1, err2               : signed(vsize DOWNTO 0);
+  SIGNAL error                    : signed(vsize DOWNTO 0);
+  SIGNAL err1, err2               : signed(vsize+1 DOWNTO 0);
 
 -- OPERATION
 --
@@ -63,9 +63,9 @@ BEGIN
     
   BEGIN
 
-    err1 <= abs(resize(error, vsize+1) + signed(yincr)); --todo: vsize+1 size
+    err1 <= abs(resize(error, err1'length) + signed('0' & yincr)); --todo: vsize+1 size
 
-    err2 <= abs(resize(error, vsize+1) + signed(yincr) - signed(xincr)); --todo: vsize+2 size?
+    err2 <= abs(resize(error, err2'length) + signed('0' & yincr) - signed('0' & xincr)); --todo: vsize+2 size?
 
     done1 <= '0';
     IF x1=xnew and y1=ynew and resetx = '0' and draw = '0' THEN
@@ -100,12 +100,12 @@ BEGIN
         -- draw new pizel in diagonal direction
         y1    <= y1 + 1;
         x1    <= x1 + 1;
-        error <= error + signed(yincr) - signed(xincr);
+        error <= error + signed('0' & yincr) - signed('0' & xincr);
         
       ELSIF err1 < err2 OR (err1 = err2 AND xbias = '1') THEN
         -- draw new pixel in x direction
         x1    <= x1 + 1;
-        error <= error + signed(yincr);
+        error <= error + signed('0' & yincr);
       END IF;
     end if;
   END PROCESS R1;

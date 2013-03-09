@@ -19,7 +19,7 @@ PACKAGE config_pack IS
   
   
   CONSTANT config_window_width : integer :=
-    55;    -- this reduces the number of pixels displayed
+    64;    -- this reduces the number of pixels displayed
            -- on the screen at the end of the testbench
            -- set to 64 for full display of RAM memory
 
