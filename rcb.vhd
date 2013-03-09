@@ -273,6 +273,11 @@ begin
 						pixcornerswaptmp := pixcorners_s(0);
 						pixcorners_s(0) := pixcorners_s(2);
 						pixcorners_s(2) := pixcornerswaptmp;
+						
+					elsif finalxblock = startxblock and pixcorners_s(0) > pixcorners_s(2) then
+						pixcornerswaptmp := pixcorners_s(0);
+						pixcorners_s(0) := pixcorners_s(2);
+						pixcorners_s(2) := pixcornerswaptmp;
 					end if ;
 
 					if finalyblock < startyblock then
@@ -280,6 +285,11 @@ begin
 						startyblock := finalyblock;
 						finalyblock := blockswaptmp;
 
+						pixcornerswaptmp := pixcorners_s(1);
+						pixcorners_s(1) := pixcorners_s(3);
+						pixcorners_s(3) := pixcornerswaptmp;
+
+					elsif finalyblock = startyblock and pixcorners_s(1) > pixcorners_s(3) then
 						pixcornerswaptmp := pixcorners_s(1);
 						pixcorners_s(1) := pixcorners_s(3);
 						pixcorners_s(3) := pixcornerswaptmp;
