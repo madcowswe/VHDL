@@ -24,8 +24,8 @@ entity rcb is
 end entity rcb;
 
 architecture arch of rcb is
-	type rcbstate_t is (UNINITIALIZED, IDLE, drawpix, fill, do_fill, move);
-	signal rcbstate : rcbstate_t;
+	type rcb_state_t is (UNINITIALIZED, IDLE, drawpix, fill, do_fill, move);
+	signal rcb_state : rcb_state_t;
 	SIGNAL ready : std_logic;
 	signal nop_flush_countdown : unsigned(FLUSH_LATENCY_COUNTER_SIZE-1 downto 0);
 
@@ -71,7 +71,7 @@ architecture arch of rcb is
 		RETURN (to_integer(x) MOD 4) + 4 * (to_integer(y) MOD 4);
 	END;
 
-	function compute_next_state(dbcmd: db_2_rcd) return rcbstate_t is
+	function compute_next_state(dbcmd: db_2_rcd) return rcb_state_t is
 	begin
 		if dbcmd.startcmd = '1' then
 			case( dbcmd.rcb_cmd ) is
@@ -145,7 +145,7 @@ begin
 		end if;
 
 		if reset = '1' then
-			rcbstate <= IDLE;
+			rcb_state <= IDLE;
 			storetag <= to_unsigned(0, storetag'length);
 			nop_flush_countdown <= to_unsigned(FLUSH_LATENCY, nop_flush_countdown'length);
 			fillstart_x <= xyutype(to_unsigned(0,xyutype'length));
@@ -161,11 +161,11 @@ begin
 				storetag <= requested_storetag;
 			end if ;
 
-			case( rcbstate ) is 
+			case( rcb_state ) is 
 
 				when IDLE => 
 					--always accept new command when in idle
-					rcbstate <= compute_next_state(dbb);
+					rcb_state <= compute_next_state(dbb);
 					currcmd <= dbb;
 
 				when drawpix =>
@@ -176,7 +176,7 @@ begin
 
 					-- update state if we are ready for next command
 					if ready = '1' then
-						rcbstate <= compute_next_state(dbb);
+						rcb_state <= compute_next_state(dbb);
 						currcmd <= dbb;
 					end if ;
 
@@ -239,7 +239,7 @@ begin
 					fillstart_y <= unsigned(currcmd.y);
 
 					--Execute the fill!
-					rcbstate <= do_fill;
+					rcb_state <= do_fill;
 
 				when do_fill =>
 
@@ -247,7 +247,7 @@ begin
 
 						-- If lastfill, then go to next state
 						if lastfill = '1' then
-							rcbstate <= compute_next_state(dbb);
+							rcb_state <= compute_next_state(dbb);
 							currcmd <= dbb;
 						end if;
 					  
@@ -296,7 +296,7 @@ begin
 					fillstart_y <= unsigned(currcmd.y);
 
 					--move command always finishes in 1 cycle
-					rcbstate <= compute_next_state(dbb);
+					rcb_state <= compute_next_state(dbb);
 					currcmd <= dbb;
 
 				when others => NULL;
@@ -313,7 +313,7 @@ begin
 	dbb_delaycmd <= dbb.startcmd and not (ready and lastfill);
 	rcb_finish <= ready and lastfill and not dbb.startcmd and not reset and is_same when nop_flush_countdown = to_unsigned(0, nop_flush_countdown'length) else '0';
 
-	C1 : process(rcbstate, storetag, wen_all, start_rmw, delay_rmw, currcmd, pw, is_same, pixcorners, pixcorner_in_currblock, buswen, requested_storetag, curryblock, currxblock)
+	C1 : process(rcb_state, storetag, wen_all, start_rmw, delay_rmw, currcmd, pw, is_same, pixcorners, pixcorner_in_currblock, buswen, requested_storetag, curryblock, currxblock)
 		variable startpix_x : unsigned(1 downto 0) ;
 		variable startpix_y : unsigned(1 downto 0) ;
 		variable endpix_x : unsigned(1 downto 0) ;
@@ -331,7 +331,7 @@ begin
   		pixopin <= pixop_t(std_logic_vector'("--"));
   		pixnum <= to_unsigned(0, pixnum'length);
 
-		case( rcbstate ) is
+		case( rcb_state ) is
 
 			when IDLE =>
 				ready <= '1';
@@ -345,7 +345,7 @@ begin
 			when drawpix|do_fill =>
 
 				--compute requested tag
-				case( rcbstate ) is
+				case( rcb_state ) is
 					when drawpix =>
 						requested_storetag <= to_unsigned(an(xyutype(currcmd.x), xyutype(currcmd.y)), storetag'length);
 					when do_fill =>
@@ -398,11 +398,11 @@ begin
 
 				-- store pixel command in cache if correct word is loaded, or if cache will be flushed or is clean
 				if (storetag = requested_storetag) or wen_all = '1' or is_same = '1' then
-					if rcbstate = do_fill then
-						buswen <= '1';
-					elsif rcbstate = drawpix then
-						pw <= '1';
-					end if;
+					case( rcb_state ) is
+						when do_fill => buswen <= '1';
+						when drawpix => pw <= '1';
+						when others => NULL;
+					end case ;
 				end if ;
 				
 				-- decode pixel address straight from command
