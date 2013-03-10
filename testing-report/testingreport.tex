@@ -76,34 +76,54 @@ language=c
 %	Write the abstract here
 %\end{abstract}
 
-%\tableofcontents
-%\clearpage
+\tableofcontents
+\clearpage
 
-\section{First section}
+\section{Operation}
+The following features are implemented:
+\begin{itemize}
+	\item Line drawing:
+	\begin{itemize}
+		\item All colors
+		\item All directions
+		\item Any length (including one pixel and entire screen)
+	\end{itemize}
+	\item Fills (Clearscreen)
+	\begin{itemize}
+		\item All colors
+		\item All directions
+		\item Any size
+		\item Crossing any cache word boundary
+	\end{itemize}
+\end{itemize}
 
-Your text \emph{goes} here.
+\section{Tests} % (fold)
+\label{sec:tests}
 
-\subsection{A subsection}
+\subsection{First Test} % (fold)
+\label{sub:first_test}
 
-More text.
+This inital test tests the basic operation of the hardware, with no special corner case consideration. It tests the following:
+\begin{itemize}
+	\item Drawing lines in all 8 octants (including horizontal/vertical).
+	\item White/black/invert lines.
+	\item Basic fill with black color with coordinates specified as bottom left to top right.
+\end{itemize}
 
-\section{Ryans Unifinished Stuff} % (fold)
-\label{sec:ryans_unifinished_stuff}
+In terms of hardware, this tests:
+\begin{itemize}
+	\item That commands are handled properly.
+	\item That interfaces are not violated.
+	\item That the line drawing fsm and caching fsm are working.
+	\item That color selection works for lines.
+	\item That basic filling works.
+\end{itemize}
 
-first test:
-drawing lines in all 8 octants (plus horizontal/vertical)
-white/black/invert lines
-basic fill with black color with coordinates specified as bottom left to top right
+% subsection first_test (end)
 
-=====
-for hw this tests.....
-basic operation of both blocks:
- commands handled properly 
- interfaces not violated 
- line drawing fsm and caching working
- color selection works for lines
- basic filling works (implemented in rcb)
-==============================
+\subsection{Second Test} % (fold)
+\label{sub:second_test}
+
 second test:
 multipoint lines (starting line segment from previous line endpoint)
 black/white/invert fills
@@ -114,6 +134,15 @@ in addition to the above, tested content:
  state of cursor saved and handled properly in db
  color selection for fills
 ==============================
+
+% subsection second_test (end)
+
+% section tests (end)
+
+\section{Ryans Unifinished Stuff} % (fold)
+\label{sec:ryans_unifinished_stuff}
+
+
 third test:
 fills in all directions (i.e. the coordinates are no longer always bottom left to top right)
 ================
