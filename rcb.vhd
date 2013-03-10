@@ -205,9 +205,7 @@ begin
 		variable finalyblock : block_t;
 		variable currxblock_s : block_t;
 		variable curryblock_s : block_t;
-		variable blockswaptmp : block_t;
 		variable pixcorners_s : pixcorners_t;
-		variable pixcornerswaptmp : unsigned(1 downto 0);
 	begin
 		WAIT UNTIL clk'event AND clk = '1';
 
@@ -266,33 +264,19 @@ begin
 
 					-- always fill from bottom left to top right
 					if finalxblock < startxblock then
-						blockswaptmp := startxblock;
-						startxblock := finalxblock;
-						finalxblock := blockswaptmp;
+						swap_arrays(startxblock, finalxblock);
+						swap_arrays(pixcorners_s(0), pixcorners_s(2));
 
-						pixcornerswaptmp := pixcorners_s(0);
-						pixcorners_s(0) := pixcorners_s(2);
-						pixcorners_s(2) := pixcornerswaptmp;
-						
 					elsif finalxblock = startxblock and pixcorners_s(0) > pixcorners_s(2) then
-						pixcornerswaptmp := pixcorners_s(0);
-						pixcorners_s(0) := pixcorners_s(2);
-						pixcorners_s(2) := pixcornerswaptmp;
+						swap_arrays(pixcorners_s(0), pixcorners_s(2));
 					end if ;
 
 					if finalyblock < startyblock then
-						blockswaptmp := startyblock;
-						startyblock := finalyblock;
-						finalyblock := blockswaptmp;
-
-						pixcornerswaptmp := pixcorners_s(1);
-						pixcorners_s(1) := pixcorners_s(3);
-						pixcorners_s(3) := pixcornerswaptmp;
+						swap_arrays(startyblock, finalyblock);
+						swap_arrays(pixcorners_s(1), pixcorners_s(3));
 
 					elsif finalyblock = startyblock and pixcorners_s(1) > pixcorners_s(3) then
-						pixcornerswaptmp := pixcorners_s(1);
-						pixcorners_s(1) := pixcorners_s(3);
-						pixcorners_s(3) := pixcornerswaptmp;
+						swap_arrays(pixcorners_s(1), pixcorners_s(3));
 					end if ;
 
 					pixcorners <= pixcorners_s;

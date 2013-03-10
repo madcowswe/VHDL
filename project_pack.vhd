@@ -1,6 +1,7 @@
 USE WORK.config_pack.ALL;
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
+USE IEEE.numeric_std.ALL;
 
 PACKAGE project_pack IS
 
@@ -23,6 +24,10 @@ RECORD -- possible type for complete interface. Change as required
    delay : std_logic; -- from RCD to DB
 END RECORD;
 
+procedure swap_arrays (a1, a2 : inout std_logic_vector);
+procedure swap_arrays (a1, a2 : inout unsigned);
+procedure swap_arrays (a1, a2 : inout signed);
+
 --------------------------------------------------------------------------
 
 constant dbrcb_move : std_logic_vector(2 downto 0) := "000";
@@ -37,3 +42,34 @@ constant dbrcb_fill_invert : std_logic_vector(2 downto 0) := "111";
 
 
 END PACKAGE project_pack;
+
+package body project_pack IS
+
+	procedure swap_arrays (a1, a2 : inout std_logic_vector) is
+		variable temp : std_logic_vector(a1'range);
+	begin
+		assert a1'length = a2'length;
+		temp := a1;
+		a1 := a2;
+		a2 := temp;
+	end procedure swap_arrays;
+
+	procedure swap_arrays (a1, a2 : inout unsigned) is
+		variable temp : unsigned(a1'range);
+	begin
+		assert a1'length = a2'length;
+		temp := a1;
+		a1 := a2;
+		a2 := temp;
+	end procedure swap_arrays;
+	
+	procedure swap_arrays (a1, a2 : inout signed) is
+		variable temp : signed(a1'range);
+	begin
+		assert a1'length = a2'length;
+		temp := a1;
+		a1 := a2;
+		a2 := temp;
+	end procedure swap_arrays;
+
+end package body project_pack;
