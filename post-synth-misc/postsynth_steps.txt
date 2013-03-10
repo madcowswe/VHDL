@@ -1,0 +1,19 @@
+synthesise with the following to get .vhm:
+Project->implementation options->implementation results->Write Mapped VHDL Netlist. 
+
+in modelsim:
+
+create new library synplify
+
+vcom -work synplify C:/Synopsys/fpga_F201109SP1/lib/vhdl_sim/synplify.vhd
+
+add to project:
+config_pack.vhd
+vdp_pack.vhd
+vdp_testbench.vhd
+vram.vhd
+utility_pack.vhd
+postsynth.vhm -> .vhd
+
+
+simulate
