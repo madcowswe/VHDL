@@ -99,7 +99,7 @@ The following features are implemented:
 \section{Tests} % (fold)
 \label{sec:tests}
 
-The following tests always include the tests before them. I.e. test 3 includes all commands of test 2 and Test 1. This is done so we can evaluate precisely the additional code coverage rendered by each addition. The exception is the Random test, which is comprised of only random commands.
+The following tests always include the tests before them. I.e. test 3 includes all commands of tests 1 and 2. This is done so we can evaluate precisely the additional code coverage rendered by each addition. The exception is the Random fuzz test, which is comprised of only random commands.
 
 \subsection{First Test} % (fold)
 \label{sub:first_test}
@@ -111,13 +111,13 @@ This initial test checks the basic operation of the hardware, with no special co
 	\item Basic fill with black colour, with coordinates specified as bottom left to top right.
 \end{itemize}
 
-In terms of hardware, this tests:
+In terms of hardware, this tests that:
 \begin{itemize}
-	\item That commands are handled properly.
-	\item That interfaces are not violated.
-	\item That the line drawing FSM and caching FSM are working.
-	\item That colour selection works for lines.
-	\item That basic filling works.
+	\item commands are handled properly.
+	\item interfaces are not violated.
+	\item the line drawing FSM and caching FSM are working.
+	\item colour selection works for lines.
+	\item basic filling works.
 \end{itemize}
 
 \textbf{Total coverage: 85.4\%}
@@ -252,7 +252,7 @@ The Ram Control Block's finish condition is over-conditioned. That is, some comb
 
 The Ram FSM block indicates that it has uncovered statements in a function declared in a package at the top of the file. This is however not the case as putting a breakpoint on a line of this function reveals that the code does hit the statements in the function. Thus we conclude that, for the coverage report for these particular lines, Modelsim's presentation of the coverage of functions is somewhat inconsistent.
 
-Excluding the above exceptions, which have given reasons for lack of coverage, the code has \emph{\textbf{100\% coverage}}.
+Excluding the above exceptions, which have given reasons for lack of coverage, the code has close to 100\% coverage.
 
 \subsection{Comments on Coverage and Correctness} % (fold)
 \label{sub:comments_on_coverage_and_correctness}
