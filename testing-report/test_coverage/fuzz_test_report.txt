@@ -67,5 +67,3 @@ File: C:/temp/COVERAGE/rmw.vhd
 
 
 NEVER FAILED: 100.0%  ASSERTIONS: 6
-
-
