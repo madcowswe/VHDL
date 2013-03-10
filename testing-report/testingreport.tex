@@ -63,7 +63,7 @@ language=c
 %%%-------------------------------------------------------------------
 
 
-\title{Title Here}
+\title{Complete Design of Vector Display Processor}
 \author{Oskar Weigl - ow610\\ and \\ Ryan Savitski - rs510}
 %\date{} % Activate to display a given date or no date (if empty),
          % otherwise the current date is printed 
@@ -123,54 +123,113 @@ In terms of hardware, this tests:
 
 \subsection{Second Test} % (fold)
 \label{sub:second_test}
+This test checks that the hardware can handle multipoint lines. That is, line segment sequences without a move command in-between. It also extends the fill tests to handle all colors: black, white and invert.
 
-second test:
-multipoint lines (starting line segment from previous line endpoint)
-black/white/invert fills
-
-=====
-for hw this tests.....
-in addition to the above, tested content:
- state of cursor saved and handled properly in db
- color selection for fills
-==============================
+In addition to the previous tests, this test checks the correct implementation of saving the state of cursor, and that the different colors work with the fills.
 
 % subsection second_test (end)
 
+\subsection{Third Test} % (fold)
+\label{sub:third_test}
+
+This test checks fills in all directions. The fill implementation works by always filling from bottom left to top right, and if the incoming command has any other direction, it swaps the start and end coordinates accordingly. This test checks that the swaps are successful.
+
+% subsection third_test (end)
+
+\subsection{Fourth Test} % (fold)
+\label{sub:fourth_test}
+
+This test checks the corner case of lines and fills that are only a single pixel long/wide. It also checks for fills that are a single pixel tall or a single pixel wide, but where the other dimension is of normal size.
+As there is special handling of single pixel lines/fills in the draw block, this type of test will make sure that this special handling works. This also checks that the ram control block can handle start and end points that share the same x or y coordinate. That is, it checks that the swap comparisons do not contain any off-by-one error or similar.
+
+% subsection forth_test (end)
+
+\subsection{Fith Test} % (fold)
+\label{sub:fith_test}
+
+This test draws lines that are longer than half the size of the screen. In particular, it draws a line from corner to corner. This checks that the variables in the \verb"draw_octant" block have enough bits to not overflow on large lines.
+
+This test uncovered a bug in the \verb"draw_octant" code that was provided. It used a cast to \verb"signed" from \verb"unsigned" which broke if the top bit was set. That is, it used \verb"signed(xincr)" instead of \verb"signed('0' & xincr)". This bug was corrected at this point.
+
+% subsection fith_test (end)
+
+\subsection{Sixth Test} % (fold)
+\label{sub:sixth_test}
+
+This test does a fill in the reversed direction (top right to bottom left) which is localised to a single cache block. This will check if the swapping of start and end points for the fill will occur if the fill is inside a single block.
+The test also does a (reversed) 2x2 fill that perfectly straddles four cache block boundaries. This will check that fills that require only a single pixel per block works, and also checks that the correct blocks are loaded for the correct pixels.
+This test also does a fill over the entire screen. This checks that the fill sequencing counters are wide enough and don't overflow.
+
+A bug was discovered when doing a reversed fill that was localised to a single cache block. It turns out that the code didn't cover this case. The bug was fixed at this point.
+
+% subsection sixth_test (end)
+
+\subsection{Seventh Test} % (fold)
+\label{sub:seventh_test}
+
+Using feedback from the code coverage tools of Modelsim, we discovered that some FSM transitions in the Draw Block were not exercised. That is, so far there has pretty much always been a move command between drawing of lines and fills. To make sure that these transitions are also covered, the following commands amend the tests:
+\begin{itemize}
+	\item fill $\rightarrow$ line
+	\item fill $\rightarrow$ single pix
+	\item line $\rightarrow$ fill
+	\item line $\rightarrow$ single pix
+	\item single pix $\rightarrow$ fill
+	\item single pix $\rightarrow$ line
+	\item move $\rightarrow$ move
+\end{itemize}
+
+% subsection seventh_test (end)
+
+\subsection{Eighth Test} % (fold)
+\label{sub:eighth_test}
+
+Further checking the code coverage, we found that the function that resolves the command to be stored in the operation cache when the new command is \verb"invert" is only applied to \verb"same".
+We added some commands that would do all types of fills on top of all other types of fill, all within the same cache block. This is so that we can check that the combination of old and new commands without flushing the cache works.
+
+% subsection eighth_test (end)
+
 % section tests (end)
+
+\section{Coverage Analysis} % (fold)
+\label{sec:coverage_analysis}
+
+What isn't covered and why
+%TODO write about anything that could be missed by pure coverage, to at least show that we understand that 100% doesn't mean a working design
+
+% section coverage_analysis (end)
+
+\section{Synthesis and Post Synthesis} % (fold)
+\label{sec:synthesis_and_post_synthesis}
+
+\subsection{Synthesis Warnings} % (fold)
+\label{sub:synthesis_warnings}
+
+Several synthesis warnings were encountered. Some prompted for fixes of the code, while others were assessed to be safe to ignore. The only synthesiser warnings that required fixing was inferred latches for incompletely driven signals in the combinatorial block. This was easily fixed by using a default assignment at the top of the block. The following synthesis warnings were assesed to be safe to ignore:
+\begin{itemize}
+	\item \verb"Variable startxblock read before being assigned." This warning is generated because \verb"startxblock" is only written in the state \verb"fill" and read in the state \verb"do_fill". This is in fact fine, as the state \verb"do_fill" can only be entered from the state \verb"fill". A way of doing this that would avoid raising this warning would be to use a signal to communicate. However, the reason for using a variable was that this communication is isolated to the process and it seems unnecessary to litter the architecture name-space.
+	\item \verb"OTHERS clause is not synthesized". This is part of a function that returns \verb"XX" when the inputs are undefined. However, when synthesised, the inputs will always be defined, so this case is dropped. This is fine.
+	\item \verb"Pruning register ..." For some parts of the code, the easiest way to do in-place operations is to make a shadowing variable that always get news values at the start of the process. This means that the variables never need to save any state between clock edges, and as such they are pruned. Thus, this is the expected behaviour, and as such the warnings are safely ignored.
+	\item \verb"Input xbias is unused". This is expected, as the design does not use \verb"xbias".
+	\item \verb"Register bit ...state[5] is always 0". The synthesiser generates one-hot encoding (as verified by checking synthesis notes). The pruned bit is because we include an unreachable state called \verb"UNINITIALISED" as the first item in the state type. This is meant to serve analogously to \verb"'U'" of \verb"std_logic", that is, to detect improper reset behaviour during simulation. The fact that the synthesis tool chose to ignore this state is exactly as per design: the same way that \verb"'U'" is ignored.
+\end{itemize}
+
+
+% subsection synthesis_warnings (end)
+
+% section synthesis_and_post_synthesis (end)
 
 \section{Ryans Unifinished Stuff} % (fold)
 \label{sec:ryans_unifinished_stuff}
 
-
-third test:
-fills in all directions (i.e. the coordinates are no longer always bottom left to top right)
-================
-tests in hw....
- fill logic in rcb can handle all directions of start and end coordinate points
-================================
-fourth test:
-single pixel lines/fills
-single pixel wide fills
-===============
-tests:
- special handling of single pixel lines/fills in the db
- handling of 1-pixel wide fills in rcb
- 
-=================================
-fifth test: 
-long lines
-
-=======
-tests:
- whether draw entity has overflows in errors for long lines (note: atm doesn't check it extensively)
-=======
+===
+RCB synthesis warnings
+Various registers pruned: expected
+others clauses not synthed
 
 
-????
-fills inside one cache
-fills that cross 4 caches
-multiple inversions
+==
+postsynth: open port problem: ciel(logstuff)
+test 8 and josh's fuzzer works postsynth
 
 % section ryans_unifinished_stuff (end)
 
