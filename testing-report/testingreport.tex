@@ -1,0 +1,148 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+\documentclass[]{article}
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{a4paper} % or letterpaper (US) or a5paper or....
+% \geometry{margin=1in} % for example, change the margins to 2 inches all round
+% \geometry{landscape} % set up the page for landscape
+%   read geometry.pdf for detailed page layout information
+
+\usepackage{graphicx} % support the \includegraphics command and options
+
+% \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+%%% PACKAGES
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+\usepackage{microtype} %makes awesome kerning and punctuation come half way out the edge of the text
+\usepackage{listings} %for code listings
+\usepackage{color} %for colored syntax highligting
+
+%%% Code listing
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{breaklines=true,
+basicstyle=\footnotesize\ttfamily,
+commentstyle=\color{mygreen},
+keywordstyle=\color{blue},
+numberstyle=\tiny\color{mygray},
+tabsize=2,
+language=c
+}
+
+% to include a file as a listing: \lstinputlisting{intio.c}
+% inline listing: \begin{lstlisting}[frame=single]
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+%\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+%\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+\usepackage{hyperref} % use hyperlinked ToC
+\hypersetup{colorlinks=true, linkcolor=black}
+
+%%%-------------------------------------------------------------------
+
+
+\title{Title Here}
+\author{Oskar Weigl}
+%\date{} % Activate to display a given date or no date (if empty),
+         % otherwise the current date is printed 
+
+\begin{document}
+\maketitle
+
+%\renewcommand{\abstractname}{Summary}
+%\begin{abstract}
+%	Write the abstract here
+%\end{abstract}
+
+%\tableofcontents
+%\clearpage
+
+\section{First section}
+
+Your text \emph{goes} here.
+
+\subsection{A subsection}
+
+More text.
+
+\section{Ryans Unifinished Stuff} % (fold)
+\label{sec:ryans_unifinished_stuff}
+
+first test:
+drawing lines in all 8 octants (plus horizontal/vertical)
+white/black/invert lines
+basic fill with black color with coordinates specified as bottom left to top right
+
+=====
+for hw this tests.....
+basic operation of both blocks:
+ commands handled properly 
+ interfaces not violated 
+ line drawing fsm and caching working
+ color selection works for lines
+ basic filling works (implemented in rcb)
+==============================
+second test:
+multipoint lines (starting line segment from previous line endpoint)
+black/white/invert fills
+
+=====
+for hw this tests.....
+in addition to the above, tested content:
+ state of cursor saved and handled properly in db
+ color selection for fills
+==============================
+third test:
+fills in all directions (i.e. the coordinates are no longer always bottom left to top right)
+================
+tests in hw....
+ fill logic in rcb can handle all directions of start and end coordinate points
+================================
+fourth test:
+single pixel lines/fills
+single pixel wide fills
+===============
+tests:
+ special handling of single pixel lines/fills in the db
+ handling of 1-pixel wide fills in rcb
+ 
+=================================
+fifth test: 
+long lines
+
+=======
+tests:
+ whether draw entity has overflows in errors for long lines (note: atm doesn't check it extensively)
+=======
+
+
+????
+fills inside one cache
+fills that cross 4 caches
+multiple inversions
+
+% section ryans_unifinished_stuff (end)
+
+\end{document}
