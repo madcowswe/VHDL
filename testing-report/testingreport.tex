@@ -257,20 +257,54 @@ As such, the bug that it uncovered would not have been uncovered using code cove
 
 postsynth: open port problem: ciel(logstuff)
 
+\subsection{Synthesis option space exploration} % (fold)
+
+The design was synthesised with a variety of options under Synplify for Altera Cyclone II EP2C5 QC208 -6 speed. Requested frequency for all runs: 100 MHz. It is worth noting that auto-constrained clock was giving unexpected estimated frequencies such as retimed versions being slower.
+\begin{itemize}
+	\item Estimated design speed with default options: 89.8 MHz. The defaults are as follows:
+
+\begin{itemize}
+	\item device mapping enhanced optimisation
+	\item default enum encoding
+	\item fsm compiler
+	\item resource sharing
+	\item pipelining
+
+
+\end{itemize}
+
+	
+\item With register retiming turned on: 93.5 Mhz. This is as expected, the critical paths were moved around by the retiming process, producing a faster design.
+
+\item Adding fsm explorer doesn't affect the design speed as fsm state encoding is not the limiting factor of the design.
+
+\item Automatic compile points (ACP) setting will not affect the design speed in a positive way as it is simply a multicore compilation option.
+
+\end{itemize}
+
+\label{sub:synthesis_option_space_exploration}
+
+% subsection synthesis_option_space_exploration (end)
+
 \subsection{Synthesis Warnings} % (fold)
 \label{sub:synthesis_warnings}
 
-Several synthesis warnings were encountered. Some prompted for fixes of the code, while others were assessed to be safe to ignore. The only synthesiser warnings that required fixing was inferred latches for incompletely driven signals in the combinatorial block. This was easily fixed by using a default assignment at the top of the block. The following synthesis warnings were assesed to be safe to ignore:
+Several synthesis warnings were encountered. Some prompted for fixes of the code, while others were assessed to be safe to ignore. The only synthesiser warnings that required fixing were inferred latches for incompletely driven signals in the combinatorial block of rcb. This was easily fixed by using a default assignment at the top of the block. The following synthesis warnings were assesed to be safe to ignore:
 \begin{itemize}
 	\item \verb"Variable startxblock read before being assigned." This warning is generated because \verb"startxblock" is only written in the state \verb"fill" and read in the state \verb"do_fill". This is in fact fine, as the state \verb"do_fill" can only be entered from the state \verb"fill". A way of doing this that would avoid raising this warning would be to use a signal to communicate. However, the reason for using a variable was that this communication is isolated to the process and it seems unnecessary to litter the architecture name-space.
-	\item \verb"OTHERS clause is not synthesized". This is part of a function that returns \verb"XX" when the inputs are undefined. However, when synthesised, the inputs will always be defined, so this case is dropped. This is fine.
+	\item \verb"OTHERS clause is not synthesized". There are redundant others=>null defaults for case statements operating on enumerated types, this ok for future compatibility in the case of expanded enumerations.
 	\item \verb"Pruning register ..." For some parts of the code, the easiest way to do in-place operations is to make a shadowing variable that always get news values at the start of the process. This means that the variables never need to save any state between clock edges, and as such they are pruned. Thus, this is the expected behaviour, and as such the warnings are safely ignored.
-	\item \verb"Input xbias is unused". This is expected, as the design does not use \verb"xbias".
+	\item \verb"Input xbias is unused". The actual \verb"xbias" is driven fully from within the \verb"draw_any_octant" to conform to the testbench specification without forcing unnecessary restructuring to the db architecture, the correct operation (that would not pass the testbench) will correctly drive \verb"xbias"  at the db level.
 	\item \verb"Register bit ...state[5] is always 0". The synthesiser generates one-hot encoding (as verified by checking synthesis notes). The pruned bit is because we include an unreachable state called \verb"UNINITIALISED" as the first item in the state type. This is meant to serve analogously to \verb"'U'" of \verb"std_logic", that is, to detect improper reset behaviour during simulation. The fact that the synthesis tool chose to ignore this state is exactly as per design: the same way that \verb"'U'" is ignored.
 \end{itemize}
 
 % subsection synthesis_warnings (end)
 
+\subsection{Post synthesis simulation} % (fold)
+The design was simulated post-synthesis with the most complex test mentioned above and the fuzzed test. Both simulations passed the testbench normally and thus the design is considered working post-synthesis.
+\label{sub:post_synthesis_simulation}
+
+% subsection post_synthesis_simulation (end)
 % section synthesis_and_post_synthesis (end)
 
 \end{document}
