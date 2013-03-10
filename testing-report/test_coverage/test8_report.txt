@@ -1,0 +1,71 @@
+Coverage Report Summary Data by file
+
+Total Coverage By File (code coverage only, filtered view): 93.0%
+
+File: C:/temp/COVERAGE/db.vhd
+    Enabled Coverage        Active      Hits    Misses % Covered
+    ----------------        ------      ----    ------ ---------
+    Stmts                       81        81         0     100.0
+    Branches                    64        63         1      98.4
+    FEC Condition Terms          8         8         0     100.0
+    FEC Expression Terms         0         0         0     100.0
+    Toggle Bins                243       235         8      96.7
+
+File: C:/temp/COVERAGE/draw_any_octant.vhd
+    Enabled Coverage        Active      Hits    Misses % Covered
+    ----------------        ------      ----    ------ ---------
+    Stmts                       31        31         0     100.0
+    Branches                    24        24         0     100.0
+    FEC Condition Terms          2         2         0     100.0
+    FEC Expression Terms         3         3         0     100.0
+    Toggle Bins                120       116         4      96.6
+
+File: C:/temp/COVERAGE/draw_octant.vhd
+    Enabled Coverage        Active      Hits    Misses % Covered
+    ----------------        ------      ----    ------ ---------
+    Stmts                       25        25         0     100.0
+    Branches                    10        10         0     100.0
+    FEC Condition Terms         10         8         2      80.0
+    FEC Expression Terms         0         0         0     100.0
+    Toggle Bins                168       160         8      95.2
+
+File: C:/temp/COVERAGE/pix_word_cache.vhd
+    Enabled Coverage        Active      Hits    Misses % Covered
+    ----------------        ------      ----    ------ ---------
+    Stmts                       21        20         1      95.2
+    Branches                    21        20         1      95.2
+    FEC Condition Terms          2         2         0     100.0
+    FEC Expression Terms         0         0         0     100.0
+    Toggle Bins                 24        21         3      87.5
+
+File: C:/temp/COVERAGE/ram_fsm.vhd
+    Enabled Coverage        Active      Hits    Misses % Covered
+    ----------------        ------      ----    ------ ---------
+    Stmts                       17        15         2      88.2
+    Branches                    16        14         2      87.5
+    FEC Condition Terms          2         2         0     100.0
+    FEC Expression Terms         0         0         0     100.0
+    Toggle Bins                  4         4         0     100.0
+
+File: C:/temp/COVERAGE/rcb.vhd
+    Enabled Coverage        Active      Hits    Misses % Covered
+    ----------------        ------      ----    ------ ---------
+    Stmts                      110       109         1      99.0
+    Branches                    78        77         1      98.7
+    FEC Condition Terms         19        19         0     100.0
+    FEC Expression Terms        14        10         4      71.4
+    Toggle Bins                274       269         5      98.1
+
+File: C:/temp/COVERAGE/rmw.vhd
+    Enabled Coverage        Active      Hits    Misses % Covered
+    ----------------        ------      ----    ------ ---------
+    Stmts                       11        11         0     100.0
+    Branches                     6         6         0     100.0
+    FEC Condition Terms          2         2         0     100.0
+    FEC Expression Terms         0         0         0     100.0
+    Toggle Bins                 66        66         0     100.0
+
+
+NEVER FAILED: 100.0%  ASSERTIONS: 6
+
+

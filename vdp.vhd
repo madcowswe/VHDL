@@ -52,7 +52,7 @@ BEGIN
 
 
 
-   RCB_BEHAV: ENTITY work.rcb
+   RCB_WRITTEN: ENTITY work.rcb
       PORT MAP (
     clk => clk,
     reset => reset,

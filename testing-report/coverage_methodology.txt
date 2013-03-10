@@ -1,0 +1,34 @@
+coverage methodology:
+all db and rcb related files are checked for coverage with the following flags:
+statement coverage (s)
+branch coverage (b)
+condition coverage (c)
+expression coverage (e)
+0/1 toggle coverage (t)
+ignore case statement default choice (-coverexcludedefault)
+
+
+----
+the list of files tested:
+db side:
+	db.vhd
+	draw_octant.vhd
+	draw_any_octant.vhd
+
+rcb side:
+	rcb.vhd
+	ram_fsm.vhd
+	rmw.vhd
+	pix_word_cache.vhd
+	
+---
+
+
+==================================
+
+<test reports on git>
+
+
+==================================
+with the final test:
+- fsm transitions to/from idle state is not fully tested as the provided testbench host never NOPs until it's done

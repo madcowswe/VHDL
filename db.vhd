@@ -244,7 +244,7 @@ begin
 				dbb_alias.startcmd <= '1';
 				dbb_alias.rcb_cmd <= decode_to_rcb_opcode(saved_host_cmd); 
 				dbb_alias.X <= saved_host_cmd.x; -- fill end point: from host command
-				dbb_alias.Y <= saved_host_cmd.y;
+				dbb_alias.Y <= saved_host_cmd.y; -- todo: current_xy will be more consistent, same functionality
 
 			 when others => null;
 			end case;
