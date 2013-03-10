@@ -330,7 +330,9 @@ begin
 		--as we per default do no operation, we dont care what the operands are
   		pixopin <= pixop_t(std_logic_vector'("--"));
   		pixnum <= to_unsigned(0, pixnum'length);
-
+  		pixopbus <= (others => pixop_t(std_logic_vector'("--")));
+  		requested_storetag <= to_unsigned(0, requested_storetag'length);
+  		
 		case( rcb_state ) is
 
 			when IDLE =>
