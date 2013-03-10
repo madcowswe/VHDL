@@ -202,6 +202,16 @@ Using feedback from the code coverage tools of Modelsim, we discovered that some
 Further checking the code coverage, we found that the function that resolves the command to be stored in the operation cache when the new command is \verb"invert" is only applied to \verb"same".
 We added some commands that would do all types of fills on top of all other types of fill, all within the same cache block. This is so that we can check that the combination of old and new commands, without flushing the cache, works.
 
+This is the most comprehensive test out of all manually generated tests.
+
+\begin{figure}[htbp]
+	\begin{center}
+		\lstinputlisting{../tests/test8_output.txt}
+	\end{center}
+	\caption{Output for Test 8}
+	\label{fig:output_for_test_8}
+\end{figure}
+
 \textbf{Total coverage: 93.0\%}
 
 % subsection eighth_test (end)
@@ -232,6 +242,8 @@ Referring to the above tests, and the coverage report of the most comprehensive 
 
 In the Draw Block, there is a single set of statements in an \verb"if" branch that never gets executed. This is to do with the fact that the Ram Control Block never stalls the Draw Block when a move command is issued. The lack of coverage is therefore an artefact of the high efficiency of the Ram Control Block. As the statements in this branch are rather simple, a static analysis confirms that the intended operation should work if a less efficient Ram Control Block was used.
 
+\pagebreak[1] %Hack to make text contiguous over full page figures
+
 The Ram Control Block has a branch in a \verb"case" statement that is not hit. This statement corresponds to an illegal instruction that should never be issued from the Draw Block. As such, the fact that this line is not covered is in fact meritorious. As this branch, if it were to be hit, does nothing, we can deduce that if the Draw Block were to issue this illegal instruction, the fail-safe operation of going to the IDLE state should suffice.
 
 The Pixel Word Cache has a branch in a \verb"case" statement that is not covered. This also corresponds to the same illegal instruction that is never sent. From static analysis we see that the operation that would be performed if the instruction were to be issued would be to perform no action.
@@ -255,28 +267,23 @@ As such, the bug that it uncovered would not have been uncovered using code cove
 \section{Synthesis and Post Synthesis} % (fold)
 \label{sec:synthesis_and_post_synthesis}
 
-postsynth: open port problem: ciel(logstuff)
-
-\subsection{Synthesis option space exploration} % (fold)
+\subsection{Synthesis Option Space Exploration} % (fold)
 
 The design was synthesised with a variety of options under Synplify for Altera Cyclone II EP2C5 QC208 -6 speed. Requested frequency for all runs: 100 MHz. It is worth noting that auto-constrained clock was giving unexpected estimated frequencies such as retimed versions being slower.
 \begin{itemize}
 	\item Estimated design speed with default options: 89.8 MHz. The defaults are as follows:
 
-\begin{itemize}
-	\item device mapping enhanced optimisation
-	\item default enum encoding
-	\item fsm compiler
-	\item resource sharing
-	\item pipelining
+	\begin{itemize}
+		\item device mapping enhanced optimisation
+		\item default enum encoding
+		\item fsm compiler
+		\item resource sharing
+		\item pipelining
+	\end{itemize}
 
+\item With register re-timing turned on: 93.5 Mhz. This is as expected, the critical paths were moved around by the re-timing process, producing a faster design.
 
-\end{itemize}
-
-	
-\item With register retiming turned on: 93.5 Mhz. This is as expected, the critical paths were moved around by the retiming process, producing a faster design.
-
-\item Adding fsm explorer doesn't affect the design speed as fsm state encoding is not the limiting factor of the design.
+\item Adding FSM explorer doesn't affect the design speed as fsm state encoding is not the limiting factor of the design.
 
 \item Automatic compile points (ACP) setting will not affect the design speed in a positive way as it is simply a multicore compilation option.
 
@@ -294,15 +301,21 @@ Several synthesis warnings were encountered. Some prompted for fixes of the code
 	\item \verb"Variable startxblock read before being assigned." This warning is generated because \verb"startxblock" is only written in the state \verb"fill" and read in the state \verb"do_fill". This is in fact fine, as the state \verb"do_fill" can only be entered from the state \verb"fill". A way of doing this that would avoid raising this warning would be to use a signal to communicate. However, the reason for using a variable was that this communication is isolated to the process and it seems unnecessary to litter the architecture name-space.
 	\item \verb"OTHERS clause is not synthesized". There are redundant others=>null defaults for case statements operating on enumerated types, this ok for future compatibility in the case of expanded enumerations.
 	\item \verb"Pruning register ..." For some parts of the code, the easiest way to do in-place operations is to make a shadowing variable that always get news values at the start of the process. This means that the variables never need to save any state between clock edges, and as such they are pruned. Thus, this is the expected behaviour, and as such the warnings are safely ignored.
-	\item \verb"Input xbias is unused". The actual \verb"xbias" is driven fully from within the \verb"draw_any_octant" to conform to the testbench specification without forcing unnecessary restructuring to the db architecture, the correct operation (that would not pass the testbench) will correctly drive \verb"xbias"  at the db level.
+	\item \verb"Input xbias is unused". The actual \verb"xbias" is driven fully from within the \verb"draw_any_octant" to conform to the test-bench specification without forcing unnecessary restructuring to the db architecture, the correct operation (that would not pass the testbench) will correctly drive \verb"xbias"  at the db level.
 	\item \verb"Register bit ...state[5] is always 0". The synthesiser generates one-hot encoding (as verified by checking synthesis notes). The pruned bit is because we include an unreachable state called \verb"UNINITIALISED" as the first item in the state type. This is meant to serve analogously to \verb"'U'" of \verb"std_logic", that is, to detect improper reset behaviour during simulation. The fact that the synthesis tool chose to ignore this state is exactly as per design: the same way that \verb"'U'" is ignored.
 \end{itemize}
 
 % subsection synthesis_warnings (end)
 
 \subsection{Post synthesis simulation} % (fold)
-The design was simulated post-synthesis with the most complex test mentioned above and the fuzzed test. Both simulations passed the testbench normally and thus the design is considered working post-synthesis.
 \label{sub:post_synthesis_simulation}
+
+The design was simulated post-synthesis with the most complex test mentioned in Section~\ref{sub:eighth_test} and the fuzzed test. Both simulations passed the test-bench normally and thus the design is considered working post-synthesis.
+
+Closing of the open port of \verb"vaddr" of the top level entitiy (\verb"vdb") was required so that the design could synthesise. The size of this port was chosen to be:
+\begin{equation}
+	\verb"2*VSIZE-integer(ceil(log2(real(RAM_WORD_SIZE)))"
+\end{equation}
 
 % subsection post_synthesis_simulation (end)
 % section synthesis_and_post_synthesis (end)
