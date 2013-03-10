@@ -229,15 +229,25 @@ Our design passes the test-bench when exposed to 10,000 randomly generated comma
 
 Referring to the above tests, and the coverage report of the most comprehensive test, seen in Figure~\ref{fig:report_of_coverage}, we see that not all code paths were covered.
 
-In the Draw Block, there is a single set of statments in an \verb"if" branch that never gets executed. This is to do with the fact that the Ram Control Block never stalls the Draw Block when a move command is issued. The lack of coverage is therefore an artifact of the efficiency of the Ram Control Block. As the statements are very trivial, a static analyis conforms that the intended operation should work if a less efficient Ram Control Block was used.
+In the Draw Block, there is a single set of statements in an \verb"if" branch that never gets executed. This is to do with the fact that the Ram Control Block never stalls the Draw Block when a move command is issued. The lack of coverage is therefore an artefact of the efficiency of the Ram Control Block. As the statements are very trivial, a static analysis conforms that the intended operation should work if a less efficient Ram Control Block was used.
 
-The Ram Control Block has a branch in a \verb"case" statement that is not hit. This statement corresponds to an illegal instruction that should never be issued from the Draw Block. As such, the fact that this line is not covered is indeed meritous. As this branch, if it were to be hit, does nothing, which is the same as when there is no command issued, from static analysis we can deduce that if the Draw Block were to issue this illegal instruction, the fail-safe operation of going to the IDLE state should suffice.
+The Ram Control Block has a branch in a \verb"case" statement that is not hit. This statement corresponds to an illegal instruction that should never be issued from the Draw Block. As such, the fact that this line is not covered is indeed meritorious. As this branch, if it were to be hit, does nothing, which is the same as when there is no command issued, from static analysis we can deduce that if the Draw Block were to issue this illegal instruction, the fail-safe operation of going to the IDLE state should suffice.
+
+The Pixel Word Cache has a branch in a \verb"case" statement that is not covered. This also corresponds to the illegal instruction that is never sent. From static analysis we see that the operation that would be performed if the instruction were to be issued would be to perform no action.
 
 The Ram Control Block's finish condition is over-conditioned. That is, some combinations of operand states in the expression that determines if the Ram Control Block asserts its \verb"finish" flag should be raised, are not covered. This simply means that, for example, is never the case that the Ram Control Block finishes its last command with a fill that leaves the cache clean, and other unattainable combinations.
 
+The Ram FSM block indicates that it has uncovered statements in a function declared in a package at the top of the file. This is however not the case as putting a breakpoint on a line of this function reveals that the code does hit the statements in the function. Thus we conclude that Modelsim's presentation of the coverage of functions is somewhat inconsistent.
 
+Excluding the above exceptions, which have given reasons for lack of coverage, the code has \emph{\textbf{100\% coverage}}.
 
-%TODO write about anything that could be missed by pure coverage, to at least show that we understand that 100% doesn't mean a working design. But it is a good indicator as it shows that all code paths have been exercised.
+\subsection{Comments on Coverage and Correctness} % (fold)
+\label{sub:comments_on_coverage_and_correctness}
+
+It is important to note that while having good code coverage is an important indicator on how well tested the hardware is, it is not the whole story. For example, Test 6 (Section~\ref{sub:sixth_test}) tests a feature that turned out to not be implemented.
+As such, the bug that it uncovered would not have been uncovered using code coverage, because it can only show implemented code paths that never run, not the other way around. This is why a proper test-bench is required ans why the imagination of the tester to exercise corner cases is important.
+
+% subsection comments_on_coverage_and_correctness (end)
 
 % section coverage_analysis (end)
 
