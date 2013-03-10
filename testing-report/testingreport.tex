@@ -81,13 +81,13 @@ tabsize=2,
 \section{Operation}
 The following features are implemented:
 \begin{itemize}
-	\item Line drawing:
+	\item Line drawing (implemented in Draw Block):
 	\begin{itemize}
 		\item All colors
 		\item All directions
 		\item Any length (including one pixel and entire screen)
 	\end{itemize}
-	\item Fills (Clearscreen)
+	\item Fills (implemented in Ram Control Block)
 	\begin{itemize}
 		\item All colors
 		\item All directions
@@ -99,24 +99,24 @@ The following features are implemented:
 \section{Tests} % (fold)
 \label{sec:tests}
 
-The following tests always include the tests before them. I.e. Test 3 includes all commands of Test 2 and Test 1. This is done so we can evaluate precisely the additional code coverage rendered by each addition. The exception is the Random test, which is comprised of only random commands.
+The following tests always include the tests before them. I.e. test 3 includes all commands of test 2 and Test 1. This is done so we can evaluate precisely the additional code coverage rendered by each addition. The exception is the Random test, which is comprised of only random commands.
 
 \subsection{First Test} % (fold)
 \label{sub:first_test}
 
-This inital test tests the basic operation of the hardware, with no special corner case consideration. It tests the following:
+This initial test checks the basic operation of the hardware, with no special corner case consideration. It tests the following:
 \begin{itemize}
 	\item Drawing lines in all 8 octants (including horizontal/vertical).
 	\item White/black/invert lines.
-	\item Basic fill with black color with coordinates specified as bottom left to top right.
+	\item Basic fill with black colour, with coordinates specified as bottom left to top right.
 \end{itemize}
 
 In terms of hardware, this tests:
 \begin{itemize}
 	\item That commands are handled properly.
 	\item That interfaces are not violated.
-	\item That the line drawing fsm and caching fsm are working.
-	\item That color selection works for lines.
+	\item That the line drawing FSM and caching FSM are working.
+	\item That colour selection works for lines.
 	\item That basic filling works.
 \end{itemize}
 
@@ -146,8 +146,9 @@ This test checks fills in all directions. The fill implementation works by alway
 \subsection{Fourth Test} % (fold)
 \label{sub:fourth_test}
 
-This test checks the corner case of lines and fills that are only a single pixel long/wide. It also checks for fills that are a single pixel tall or a single pixel wide, but where the other dimension is of normal size.
-As there is special handling of single pixel lines/fills in the draw block, this type of test will make sure that this special handling works. This also checks that the ram control block can handle start and end points that share the same x or y coordinate. That is, it checks that the swap comparisons do not contain any off-by-one error or similar.
+This test checks the corner case of lines and fills that only consist of a single pixel. It also checks for fills that are a single pixel tall or a single pixel wide, but where the other dimension is of normal size.
+As there is special handling of single pixel lines/fills in the draw block, this type of test will make sure that this special handling works.
+This test also checks that the ram control block can handle start and end points that share the same x or y coordinate. That is, it checks that the swap comparisons do not contain any off-by-one error or similar.
 
 \textbf{Total coverage: 89.2\%}
 
@@ -180,7 +181,7 @@ A bug was discovered when doing a reversed fill that was localised to a single c
 \subsection{Seventh Test} % (fold)
 \label{sub:seventh_test}
 
-Using feedback from the code coverage tools of Modelsim, we discovered that some FSM transitions in the Draw Block were not exercised. That is, so far there has pretty much always been a move command between drawing of lines and fills. To make sure that these transitions are also covered, the following commands amend the tests:
+Using feedback from the code coverage tools of Modelsim, we discovered that some FSM transitions in the Draw Block were not exercised. That is, so far there has pretty much always been a move command between drawing of lines and fills. To make sure that these transitions are also covered, the following command pairs amend the tests:
 \begin{itemize}
 	\item fill $\rightarrow$ line
 	\item fill $\rightarrow$ single pix
@@ -199,7 +200,7 @@ Using feedback from the code coverage tools of Modelsim, we discovered that some
 \label{sub:eighth_test}
 
 Further checking the code coverage, we found that the function that resolves the command to be stored in the operation cache when the new command is \verb"invert" is only applied to \verb"same".
-We added some commands that would do all types of fills on top of all other types of fill, all within the same cache block. This is so that we can check that the combination of old and new commands without flushing the cache works.
+We added some commands that would do all types of fills on top of all other types of fill, all within the same cache block. This is so that we can check that the combination of old and new commands, without flushing the cache, works.
 
 \textbf{Total coverage: 93.0\%}
 
@@ -208,7 +209,7 @@ We added some commands that would do all types of fills on top of all other type
 \subsection{Random Test} % (fold)
 \label{sub:random_test}
 
-Our design passes the test-bench when exposed to 10,000 randomly generated commands. We saw a small increase in code coverage from this test when compared to our synthetic tests. However, no new code paths were uncovered as the increase in coverage was only in the "expression" and "toggle" coverage metrics.
+At this point, our design passes the test-bench when exposed to 10,000 randomly generated commands. We saw a small increase in code coverage from this test when compared to our synthetic tests. However, no new code paths were uncovered as the increase in coverage was only in the "expression" and "toggle" coverage metrics.
 
 \textbf{Total coverage: 94.4\%}
 
@@ -227,17 +228,17 @@ Our design passes the test-bench when exposed to 10,000 randomly generated comma
 	\label{fig:report_of_coverage}
 \end{figure}
 
-Referring to the above tests, and the coverage report of the most comprehensive test, seen in Figure~\ref{fig:report_of_coverage}, we see that not all code paths were covered.
+Referring to the above tests, and the coverage report of the most comprehensive test, as seen in Figure~\ref{fig:report_of_coverage}, we see that not all code paths were covered.
 
-In the Draw Block, there is a single set of statements in an \verb"if" branch that never gets executed. This is to do with the fact that the Ram Control Block never stalls the Draw Block when a move command is issued. The lack of coverage is therefore an artefact of the efficiency of the Ram Control Block. As the statements are very trivial, a static analysis conforms that the intended operation should work if a less efficient Ram Control Block was used.
+In the Draw Block, there is a single set of statements in an \verb"if" branch that never gets executed. This is to do with the fact that the Ram Control Block never stalls the Draw Block when a move command is issued. The lack of coverage is therefore an artefact of the high efficiency of the Ram Control Block. As the statements in this branch are rather simple, a static analysis confirms that the intended operation should work if a less efficient Ram Control Block was used.
 
-The Ram Control Block has a branch in a \verb"case" statement that is not hit. This statement corresponds to an illegal instruction that should never be issued from the Draw Block. As such, the fact that this line is not covered is indeed meritorious. As this branch, if it were to be hit, does nothing, which is the same as when there is no command issued, from static analysis we can deduce that if the Draw Block were to issue this illegal instruction, the fail-safe operation of going to the IDLE state should suffice.
+The Ram Control Block has a branch in a \verb"case" statement that is not hit. This statement corresponds to an illegal instruction that should never be issued from the Draw Block. As such, the fact that this line is not covered is in fact meritorious. As this branch, if it were to be hit, does nothing, we can deduce that if the Draw Block were to issue this illegal instruction, the fail-safe operation of going to the IDLE state should suffice.
 
-The Pixel Word Cache has a branch in a \verb"case" statement that is not covered. This also corresponds to the illegal instruction that is never sent. From static analysis we see that the operation that would be performed if the instruction were to be issued would be to perform no action.
+The Pixel Word Cache has a branch in a \verb"case" statement that is not covered. This also corresponds to the same illegal instruction that is never sent. From static analysis we see that the operation that would be performed if the instruction were to be issued would be to perform no action.
 
-The Ram Control Block's finish condition is over-conditioned. That is, some combinations of operand states in the expression that determines if the Ram Control Block asserts its \verb"finish" flag should be raised, are not covered. This simply means that, for example, is never the case that the Ram Control Block finishes its last command with a fill that leaves the cache clean, and other unattainable combinations.
+The Ram Control Block's finish condition is over-conditioned. That is, some combinations of operand states in the expression that determines if the Ram Control Block asserts its \verb"finish" flag should be raised, are not covered. This simply means that, for example, it is never the case that the Ram Control Block finishes its last command with a fill that leaves the cache clean. This also applies to some other unattainable combinations.
 
-The Ram FSM block indicates that it has uncovered statements in a function declared in a package at the top of the file. This is however not the case as putting a breakpoint on a line of this function reveals that the code does hit the statements in the function. Thus we conclude that Modelsim's presentation of the coverage of functions is somewhat inconsistent.
+The Ram FSM block indicates that it has uncovered statements in a function declared in a package at the top of the file. This is however not the case as putting a breakpoint on a line of this function reveals that the code does hit the statements in the function. Thus we conclude that, for the coverage report for these particular lines, Modelsim's presentation of the coverage of functions is somewhat inconsistent.
 
 Excluding the above exceptions, which have given reasons for lack of coverage, the code has \emph{\textbf{100\% coverage}}.
 
