@@ -149,9 +149,10 @@ MW 50 52
 MW 32 16
 -- inversion of non-same cache lines in rcb
 MW 44 0
-CB 46 2
+CW 46 1
 CI 44 0
-CI 46 2
+CI 46 1
 MW 48 0
-CW 50 2
-CI 48 0
+CI 50 1
+CB 48 0
+CI 50 1
