@@ -5,79 +5,6 @@ library work;
 	use work.project_pack.all;
 	use work.pix_cache_pak.all;
 
-
-entity read_modify_write is
-  	port (
-		clk, reset, start 	: IN std_logic;
-		delay, vwrite 		: OUT std_logic;
-		store 				: IN store_t;
-		storetag			: IN unsigned; -- open port, exact size depends on VSIZE
-		vdin   : OUT STD_LOGIC_VECTOR(RAM_WORD_SIZE-1 DOWNTO 0);
-    	vdout  : IN  STD_LOGIC_VECTOR(RAM_WORD_SIZE-1 DOWNTO 0);
-   		vaddr  : OUT STD_LOGIC_VECTOR -- open port, exact size depends on VSIZE
-
-  	) ;
-end entity read_modify_write;
-
-architecture arch of read_modify_write is
-	signal delay1 : std_logic;
-	signal localstore : store_t;
-begin
-
-	-- FSM provides control signals for driving the vram properly
-	RAMFSM: entity work.ram_fsm port map(
-		clk => clk,
-		reset => reset,
-		start => start,
-		delay => delay1,
-		vwrite => vwrite
-	);
-
-	delay <= delay1;
-
-	R1 : process
-	begin
-		WAIT UNTIL clk'event AND clk = '1';
-
-		--sample and hold store tag = vaddr on start of operation
-		if start = '1' and delay1 = '0' then
-			localstore <= store;
-			vaddr <= std_logic_vector(storetag);
-		end if ;
-		
-	end process R1;
-
-	C1 : process (vdout, localstore)
-	begin
-
-		combinationloop : for i in vdin'range loop
-			
-			case( localstore(i) ) is
-				when same => vdin(i) <= vdout(i);
-				when black => vdin(i) <= '1';
-				when white => vdin(i) <= '0';
-				when invert => vdin(i) <= not vdout(i);
-				when others => NULL;
-			end case ;
-
-		end loop ; -- combinationloop
-
-		--TODO write this
-		--for loop that applies the cached operation to each of the
-		--contents of the ram locations and drives the data bus for the vram
-
-	end process C1;
-
-end architecture arch;
-
-
-library ieee ;
-	use ieee.std_logic_1164.all ;
-	use ieee.numeric_std.all ;
-library work;
-	use work.project_pack.all;
-	use work.pix_cache_pak.all;
-
 entity rcb is
   port (
 	clk, reset          : IN  std_logic;
@@ -100,7 +27,7 @@ architecture arch of rcb is
 	type rcbstate_t is (UNINITIALIZED, IDLE, drawpix, fill, do_fill, move);
 	signal rcbstate : rcbstate_t;
 	SIGNAL ready : std_logic;
-	signal nop_flush_countdown : unsigned(2 downto 0);
+	signal nop_flush_countdown : unsigned(FLUSH_LATENCY_COUNTER_SIZE-1 downto 0);
 
 	signal storetag : unsigned(vaddr'range);
 	signal requested_storetag : unsigned(vaddr'range);
@@ -197,12 +124,15 @@ begin
    		vaddr => vaddr
 	);
 
+    -- Registered process: does FSM transitions and fill sequencing
 	R1 : process
 		--fill sequencing vars
 		variable startxblock : block_t;
 		variable startyblock : block_t;
 		variable finalxblock : block_t;
 		variable finalyblock : block_t;
+
+		-- Shadowing variables required to do some in-place operations
 		variable currxblock_s : block_t;
 		variable curryblock_s : block_t;
 		variable pixcorners_s : pixcorners_t;
@@ -217,7 +147,7 @@ begin
 		if reset = '1' then
 			rcbstate <= IDLE;
 			storetag <= to_unsigned(0, storetag'length);
-			nop_flush_countdown <= to_unsigned(7,nop_flush_countdown'length);
+			nop_flush_countdown <= to_unsigned(FLUSH_LATENCY, nop_flush_countdown'length);
 			fillstart_x <= xyutype(to_unsigned(0,xyutype'length));
 			fillstart_x <= xyutype(to_unsigned(0,xyutype'length));
 			lastfill <= '1';
@@ -227,8 +157,8 @@ begin
 
 			-- update the store tag if we wrote to cache. Also delay autoflush if cache is active.
 			if buswen = '1' or pw = '1'then
-				nop_flush_countdown <= to_unsigned(7,nop_flush_countdown'length);
-				storetag <= requested_storetag;--to_unsigned(an(xyutype(currcmd.x), xyutype(currcmd.y)), storetag'length);
+				nop_flush_countdown <= to_unsigned(FLUSH_LATENCY, nop_flush_countdown'length);
+				storetag <= requested_storetag;
 			end if ;
 
 			case( rcbstate ) is 
@@ -281,10 +211,12 @@ begin
 
 					pixcorners <= pixcorners_s;
 					
+					-- As we start from bottom left, we always will use the bottom left corner pixels
 					pixcorner_in_currblock <= (others => '0');
 					pixcorner_in_currblock(0) <= '1';
 					pixcorner_in_currblock(1) <= '1';
 
+					-- Figure out if the top right pixel is only one block wide/tall
 					if startxblock = finalxblock then
 						pixcorner_in_currblock(2) <= '1';
 					end if;
@@ -295,8 +227,9 @@ begin
 					
 					currxblock <= startxblock;
 					curryblock <= startyblock;
-					lastfill <= '0';
 
+					-- We have the possibility of a single block fill
+					lastfill <= '0';
 					if startxblock = finalxblock and startyblock = finalyblock then
 						lastfill <= '1';
 					end if;
@@ -305,19 +238,22 @@ begin
 					fillstart_x <= unsigned(currcmd.x);
 					fillstart_y <= unsigned(currcmd.y);
 
+					--Execute the fill!
 					rcbstate <= do_fill;
 
 				when do_fill =>
 
 					if ready = '1' then
 
+						-- If lastfill, then go to next state
 						if lastfill = '1' then
 							rcbstate <= compute_next_state(dbb);
 							currcmd <= dbb;
 						end if;
 					  
-					  currxblock_s := currxblock;
-					  curryblock_s := curryblock;
+					  	-- Step to next block in sequence
+						currxblock_s := currxblock;
+						curryblock_s := curryblock;
 						if currxblock = finalxblock then
 							currxblock_s := startxblock;
 							curryblock_s := curryblock + to_unsigned(1, curryblock'length);
@@ -325,12 +261,14 @@ begin
 							currxblock_s := currxblock + to_unsigned(1, currxblock'length);
 						end if;
 
+						-- Figure out if next cycle is the last one
 						if currxblock_s = finalxblock and curryblock_s = finalyblock then
 							lastfill <= '1';
 						end if;
 
 					end if ;
 
+					-- Tell the combinatorial block which pixel corner to use
 					pixcorner_in_currblock <= (others => '0');
 					if currxblock_s = startxblock then
 						pixcorner_in_currblock(0) <= '1';
@@ -370,10 +308,10 @@ begin
 	end process R1;
 
 
-	-- Combinatorial stuff
+	-- Combinatorial block: Does all datapath logic
 
 	dbb_delaycmd <= dbb.startcmd and not (ready and lastfill);
-	rcb_finish <= ready and lastfill and not dbb.startcmd and not reset and is_same when nop_flush_countdown = "000" else '0';
+	rcb_finish <= ready and lastfill and not dbb.startcmd and not reset and is_same when nop_flush_countdown = to_unsigned(0, nop_flush_countdown'length) else '0';
 
 	C1 : process(rcbstate, storetag, wen_all, start_rmw, delay_rmw, currcmd, pw, is_same, pixcorners, pixcorner_in_currblock, buswen, requested_storetag, curryblock, currxblock)
 		variable startpix_x : unsigned(1 downto 0) ;
@@ -477,6 +415,7 @@ begin
 				ready <= pw or buswen;
 			
 			when fill => 
+				-- set ready to 0 to hold the command bus
 				ready <= '0';
 
 			when move =>

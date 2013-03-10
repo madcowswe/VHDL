@@ -2,6 +2,7 @@ USE WORK.config_pack.ALL;
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.ALL;
 USE IEEE.numeric_std.ALL;
+use IEEE.MATH_REAL.ALL; --for log2 for auto width
 
 PACKAGE project_pack IS
 
@@ -10,6 +11,9 @@ CONSTANT VSIZE: INTEGER         := 6;  -- length of pixel coordinates.
 							           -- could be changed for other applications
 									   
 CONSTANT RAM_WORD_SIZE: INTEGER := 16; -- fixed for this project could be changed by other applications
+
+CONSTANT FLUSH_LATENCY: integer := 5;
+CONSTANT FLUSH_LATENCY_COUNTER_SIZE: integer := integer(ceil(log2(real(FLUSH_LATENCY))));
 
 TYPE db_2_rcd IS
 RECORD -- possible type for interface from DB to RCD. Change as required
@@ -39,9 +43,8 @@ constant dbrcb_fill_white : std_logic_vector(2 downto 0) := "101";
 constant dbrcb_fill_black : std_logic_vector(2 downto 0) := "110";
 constant dbrcb_fill_invert : std_logic_vector(2 downto 0) := "111";
 
-
-
 END PACKAGE project_pack;
+
 
 package body project_pack IS
 
@@ -62,7 +65,7 @@ package body project_pack IS
 		a1 := a2;
 		a2 := temp;
 	end procedure swap_arrays;
-	
+
 	procedure swap_arrays (a1, a2 : inout signed) is
 		variable temp : signed(a1'range);
 	begin
