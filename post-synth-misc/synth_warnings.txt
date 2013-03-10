@@ -1,0 +1,76 @@
+@W: CD603 :"C:\temp\postsynth\rcb.vhd":258:23:258:33|Variable startxblock read before being assigned? This may cause a simulation mismatch 
+@W: CD603 :"C:\temp\postsynth\rcb.vhd":258:23:258:33|Variable startxblock read before being assigned? This may cause a simulation mismatch 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\pix_word_cache.vhd":33:3:33:16|OTHERS clause is not synthesized 
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_15(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_14(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_13(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_12(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_11(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_10(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_9(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_8(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_7(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_6(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_5(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_4(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_3(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_2(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_1(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\pix_word_cache.vhd":79:11:79:18|Pruning register R1.temp_ram_0(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\rcb.vhd":138:11:138:22|Pruning register R1.pixcorners_s_3(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\rcb.vhd":138:11:138:22|Pruning register R1.pixcorners_s_2(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\rcb.vhd":138:11:138:22|Pruning register R1.pixcorners_s_1(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\rcb.vhd":138:11:138:22|Pruning register R1.pixcorners_s_0(1 downto 0)  
+@W: CL169 :"C:\temp\postsynth\rcb.vhd":34:8:34:14|Pruning register currcmd.startcmd  
+@W: CL251 :"C:\Synopsys\fpga_F201109SP1\lib\vhd\std.vhd":0:0:0:0|All reachable assignments to R1.assert_sig11 assign 1, register removed by optimization
+@W: CL260 :"C:\temp\postsynth\rcb.vhd":34:8:34:14|Pruning register bit 2 of currcmd.rcb_cmd(2 downto 0)  
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":73:4:73:17|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":73:4:73:17|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":73:4:73:17|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":73:4:73:17|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":73:4:73:17|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":73:4:73:17|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":73:4:73:17|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":73:4:73:17|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":73:4:73:17|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":73:4:73:17|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":146:3:146:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":146:3:146:16|OTHERS clause is not synthesized 
+@W: CD604 :"C:\temp\postsynth\db_pack.vhd":146:3:146:16|OTHERS clause is not synthesized 
+@W: CL169 :"C:\temp\postsynth\draw_any_octant.vhd":40:47:40:57|Pruning register saved_xbias  
+@W: CL159 :"C:\temp\postsynth\draw_any_octant.vhd":29:31:29:35|Input xbias is unused
+@W: MO161 :"c:\temp\postsynth\db.vhd":52:8:52:16|Register bit fsm_state[5] is always 0, optimizing ...
+@W: MO161 :"c:\temp\postsynth\rcb.vhd":28:8:28:16|Register bit rcb_state[5] is always 0, optimizing ...
