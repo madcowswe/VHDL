@@ -7,6 +7,8 @@ Please note that the special port constraint to vaddr in vdp.vhd as explained at
 
 > post_synth_sim_files - all the needed files for post-synthesis simulation, same as the example ones provided but included with the submission for convenience.
 
-> tests - all of the tests used for verifying the design's operation and the model outputs.
+> tests - all of the tests used for verifying the design's operation and the model outputs. 
+(!) Note: the explanations of what they test are in the report.
 
 > report 
+(!) Note: synthesis warnings are explored for both blocks together, as are synthesis options.
