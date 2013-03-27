@@ -1,0 +1,238 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+%tells you if you use obsolote packages
+%\RequirePackage[l2tabu,orthodox]{nag}
+
+\documentclass[]{article}
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{a4paper} % or letterpaper (US) or a5paper or....
+% \geometry{margin=2in} % for example, change the margins to 2 inches all round
+% \geometry{landscape} % set up the page for landscape
+%   read geometry.pdf for detailed page layout information
+
+\usepackage{graphicx} % support the \includegraphics command and options
+
+% \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+%%% PACKAGES
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+\usepackage{microtype} %makes awesome kerning and punctuation come half way out the edge of the text
+\usepackage{listings} %for code listings
+\usepackage{color} %for colored syntax highligting
+\usepackage{rotating}
+\usepackage{pdflscape}
+\usepackage[]{algorithm2e}
+\usepackage{multirow}
+
+%%% Code listing
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\lstset{breaklines=true,
+basicstyle=\footnotesize\ttfamily,
+commentstyle=\color{mygreen},
+keywordstyle=\color{blue},
+numberstyle=\tiny\color{mygray},
+tabsize=2,
+frame=tb,
+aboveskip=5mm,
+belowskip=0mm,
+breaklines=true,
+breakatwhitespace=true
+}
+
+% to include a file as a listing: \lstinputlisting{intio.c}
+% inline listing: \begin{lstlisting}[frame=single]
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+%\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+%\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+\usepackage{hyperref} % use hyperlinked ToC
+\hypersetup{colorlinks=true, linkcolor=black, citecolor=black, filecolor=black, urlcolor=black}
+
+%%%-------------------------------------------------------------------
+
+
+\title{VHDL and Logic Synthesis: Final Report\\
+Group 1\\
+Draw block (db) entity}
+\author{Ryan Savitski - rs5010}
+\date{} % Activate to display a given date or no date (if empty),
+         % otherwise the current date is printed 
+
+\begin{document}
+\maketitle
+
+
+
+\tableofcontents
+
+\clearpage
+
+
+\section{Introduction} % (fold)
+\label{sec:introduction}
+
+% section introduction (end)
+This report discusses the final design of the draw block (db) entity in terms of performance limitations, code portability and future improvements. Both db and rcb entities make up the vector display processor (vdp), which is the top level design deliverable. As such, the report will also touch on the interface between the blocks and how it affects the performance of the entire system. All of the general design discussions can be found in the two previous reports (code review and full design elaboration) and as such are not duplicated here.
+
+\section{Portability, scalability and modularity} % (fold)
+\label{sec:portability_scalability_and_modularity}
+
+% section portability_scalability_and_modularity (end)
+
+\subsection{Types, constraints, abstraction layers} % (fold)
+\label{sub:types_constraints_abstraction_layers}
+
+% subsection types_constraints_abstraction_layers (end)
+
+The design attempts to maximise portability, modifiability and scalability by using generics, constants in shared packages and parameterised constraints/record type abstraction layers for interface ports.
+
+It is noted that the db's host-db interface port is constrained by a constant, which is poor design. However the provided packages do not implement parameterisable width on the testbench side either. If this db entity were to be used in a general design, then the best approach would be not to just parameterise the interface port's length, but instead abstract the entire interface through a record type and accessor functions.
+
+db-rcb interface is abstracted by the use of a record type. All shared constants are included in a shared config pack which both db and rcb modules use.
+
+The nested line drawing entity's ports are parameterised and as such can handle any screen size.
+
+The internal representations of host instructions are decoded to a custom record type by a function. As such, the host instruction layout could change, but the record type provides an abstraction layer that will be the only point of modification.
+
+\subsection{Functions} % (fold)
+\label{sub:functions}
+
+% subsection functions (end)
+
+Functionality such as decoding/encoding instruction words to/from internal representations are implemented in functions, as they both provide an abstraction layer and are used in several places throughout the design. The latter point addresses the fact that otherwise code would be duplicated and as such harder to maintain.
+
+An example of this is the \verb"decode_host_cmd" function, that takes the host's bit array instruction word and decodes it to a custom record type \verb"host_cmd_t". It is noted that while the function uses the \verb"*_h" opcode parameters from config pack, the bitfields to decode are hardcoded. This is poor design, however the provided packages (and the testbench environment) do not provide the necessary constants to parameterise on.
+
+\subsection{FSM description style} % (fold)
+\label{sub:fsm_description_style}
+
+% subsection fsm_description_style (end)
+
+The FSM description style used is interface/functionality centric. This means that all possible alterations to a particular interface are encapsulated in dedicated processes. This makes the design easy to modify as it does not suffer from unforeseen/hidden functionality changes by small code modifications, which could happen when FSM is described in a way such that one interface is affected from many processes and a process can affect several interfaces.
+
+The description style also made the design very easy to debug, as all errors in an interface or a signal were local to its encapsulation process(es).
+
+Furthermore, the FSM description style employed makes adding new interfaces/functionality very easy, even though the code size is bigger than highly condensed designs. However, the clarity, maintainability and extendability are well worth the bigger code size footprint. In addition, the FSM is much easier to read and understand than condensed descriptions that fit all functionality in cluttered processes.
+
+\section{Design performance limitations} % (fold)
+\label{sec:design_performance_limitations}
+
+% section design_performance_limitations (end)
+
+The db unit's FSM can transition directly from the end of one instruction into the state that handles the next host command, without any wasteful idle state inbetween, which makes the cycle performance good for a single unit design (as opposed to several parallel db frontends with an arbitrator). There are some cycles where the db-rcb interface is not utilised: move commands and line start/end point setup stages. This can be straightforwardly amortised via a fifo as explained below in the optimisations section. Furthermore, a db-rcb fifo will also amortise the wasted cache line miss cycles on the rcb side, improving the performance of the entire design.
+
+\section{Hardware speed limitations} % (fold)
+\label{sec:hardware_speed_limitations}
+
+% section hardware_speed_limitations (end)
+
+It is very important to note that when db unit was analysed alone, the critical path was not the same as for the entire vdp design (i.e. when the db block was wired up to the rcb block). The full design's critical path was due to combinatorial logic of delays and busy states. The path went from the db block, through the rcb's combinatorial busy flag and back to the draw block's enable. Therefore for the entire design, it is nonsensical to evaluate either the db's or the rcb's critical paths in isolation.
+
+But assuming the interface is switched to a more pipelined design and is no longer the design's critical path, then the local constraining path of the db might become relevant. 
+
+The 100 worst-case timing paths are in the draw entity. The specific critical path relates to the line error signal propagation, for the submitted design it goes from and to:
+\begin{verbatim}
+draw_any_octant:LINE_DRAWER|draw_octant:DO|error[0]
+->
+draw_any_octant:LINE_DRAWER|draw_octant:DO|error[1]
+\end{verbatim}
+
+Which involves the following lines of the design:
+
+\begin{verbatim}
+err2 <= abs(resize(error, err2'length) + signed('0' & yincr) - signed('0' & xincr));
+
+ELSIF err1 < err2 OR (err1 = err2 AND xbias = '1') THEN
+    x1    <= x1 + 1;
+    error <= error + signed('0' & yincr);
+END IF;
+
+\end{verbatim}
+This is expected as the drawing octant is the only unit within db that does arithmetic and other serial logic, all other parts of the design are simple FSMs.
+
+As all worst case paths are within the drawing entity, the speed improvements will be gained from improving said entity, for example by pipelining stages of the line drawing algorithm.
+
+\section{Future improvements} % (fold)
+\label{sec:future_improvements}
+
+% section future_improvements (end)
+
+A fifo between the db and rcb blocks is both an easy and impactful improvement for the following reasons:
+\begin{itemize}
+	\item As noted in the hardware speed section, the critical path for the entire vdp is through the db-rcb busy flag combinatorial logic. A fifo will provide its own busy flag, which the db entity will look at instead, and as such the busy flag logic is likely to no longer constain the maximum frequency of the design.
+	\item The vdp wastes potential ram-writing cycles when there are cursor movement instructions executed, line drawing entity commands are set up (2 cycles per line) on the db side or when the rcb is busy. By instead having a non-busy fifo to submit jobs to, the db can still submit pixel writes while the rcb is busy and the rcb can still process draw commands while the db unit is doing cursor movements or other overhead operations. The length of the fifo will need to be derived from the expected command throughput, cycles lost per cache miss and cache miss probability.
+\end{itemize}
+
+As an additional improvement, instructions can be reordered within this fifo to always pack draws to one cache line together, this would make the cache miss the minimal amount of times, only once per cacheable screenbuffer segment that is written to, assuming the rcb block segments the fills and puts them into the same reorder pipeline.
+
+Another approach to improving the throughput of the design would be to make the line drawing produce several pixels per cycles (of course, the rcb would need to be able to handle multiple commands per cycle as well). This can be done in several ways:
+\begin{itemize}
+	\item Instead of using the Bresenham's variation which decides whether to step in x or in both x and y based on accumulated error, as done in this implementation. A variant where the actual slope is computed initially lets the block know how many pixels in the x direction with the same y coordinate are done. Therefore entire horizontal line segments can be computed and submitted in one cycle. This also means that for fully horizontal lines, we can compute the entire line in one cycle. Note that the delta Bresenham's variation requires a division, whether it is worth the added hardware depends on the lengths of the lines that the hardware is expected to draw, with longer lines favouring the delta implementation.
+	\item Doing the usual Bresenham's algorithm, but instead stepping by several pixels at a time, at a cost of more hardware to compute partial errors.
+	\item Subdividing the line into smaller lines and submitting them to separate drawing entities.
+\end{itemize}
+
+Yet another approach to improve performance is to duplicate the entities, this can be either:
+\begin{itemize}
+	\item Duplicating db-rcb pairs and having an arbitrator on the host interface that decides which db will process the next command. This is the more naive and wasteful solution.
+	\item Duplicating just the db blocks (with the same arbitration being required) and instead merging all commands to the rcb through a fifo. Or, instead of a fifo, a more efficient approach would be to change the db-rcb interface. One specific possible implementation is to have many x/y/opcode field triplets and an additional field that specifies how many of the triplets contain valid commands per cycle. With this approach, the rcb can submit as many instructions per cycle as desired (at the expense of a wider interface bus).
+With either of the two approaches, the design can now process more host commands per cycle on average.
+\end{itemize}
+
+\section{Technical and project management lessons learned} % (fold)
+\label{sec:technical_and_project_management_lessons_learned}
+
+% section technical_and_project_management_lessons_learned (end)
+
+Source control revision software is extremely useful and makes shared codebases easier to manage.
+
+Code reviews help the programmer get an objective evaluation of whether their solution to a problem is going in the right direction, as well as helping uncover bugs. For the specific design bugs uncovered by code review, refer to the relevant report submitted earlier.
+
+It is sensible to parallelise the non-serial tasks of the project.
+
+Time management when writing code is crucial, as rushed code is usually both harder to maintain and more bug prone.
+
+When having a design composed of modules, unit testing and module testbenches are extremely useful for minimising the code amount to be debugged as once, and as such speed up the delivery of the entire design significantly.
+
+
+\clearpage
+
+\section{Appendix A: db.vhd code listing} % (fold)
+\label{sec:appendix_a_db_vhd_code_listing}
+
+% section appendix_a_db_vhd_code_listing (end)
+
+\lstinputlisting[language=VHDL]{src/db.vhd}
+
+\clearpage
+
+\section{Appendix B: db\_pack.vhd code listing} % (fold)
+\label{sec:appendix_b_db_pack_vhd_code_listing}
+
+\lstinputlisting[language=VHDL]{src/db_pack.vhd}
+% section appendix_b_db_pack_vhd_code_listing (end)
+
+\end{document}
